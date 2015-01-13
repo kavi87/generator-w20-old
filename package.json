@@ -1,0 +1,9 @@
+{
+  "name": "generator-w20",
+  "version": "0.1.0",
+  "description": "Seed web framework (w20) generator",
+  "keywords": ["yeoman-generator", "w20", "seed", "web", "angularJS"],
+  "dependencies": {
+    "yeoman-generator": "^0.18.3"
+  }
+}
