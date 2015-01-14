@@ -4,6 +4,8 @@
   "description": "Seed web framework (w20) generator",
   "keywords": ["yeoman-generator", "w20", "seed", "web", "angularJS"],
   "dependencies": {
-    "yeoman-generator": "^0.18.3"
+    "yeoman-generator": "^0.18.3",
+    "w20": "^2.0.0",
+    "lodash": "^2.4.1"
   }
 }
