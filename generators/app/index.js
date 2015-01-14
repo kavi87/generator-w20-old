@@ -21,7 +21,56 @@ function parseW20Manifest(path, callback) {
     });
 }
 
-// hello
+function configureFragment(fragment, context, finished) {
+    var that = context;
+    var pathToManifest = __dirname + '/../../node_modules/w20/' + fragment.split('-')[1] +'/'+ fragment +'.w20.json';
+
+    that.log('\nConfigure ' + fragment + ': \n');
+    w20Project[fragment] = { modules: {} };
+
+    parseW20Manifest(pathToManifest, function(manifest) {
+        var prompt = [];
+        _.each(manifest.modules, function(moduleDefinition, moduleName) {
+            prompt.push({
+                type    : 'confirm',
+                name    :  moduleName,
+                message : 'Configure module ' + moduleName + ' ?',
+                default : false
+            });
+            _.each(manifest.modules[moduleName].configSchema.properties, function(modulePropertyConfig, modulePropertyName) {
+                prompt.push({
+                    type    : 'input',
+                    name    : moduleName + '&&!' + modulePropertyName,
+                    message : modulePropertyConfig.description + ' (' + modulePropertyConfig.type + ')',
+                    when: function(answers) {
+                        return answers[moduleName];
+                    }
+                })
+            });
+        });
+        var done = that.async();
+        that.prompt(prompt, function (answers) {
+            _.each(answers, function(value, key) {
+                if (key.indexOf('&&!') === -1 && answers[key]) {
+                    w20Project[fragment].modules[key] =w20Project[fragment].modules[key] || {};
+                } else if (value.length && key.indexOf('&&!') > -1) {
+                    var moduleAndProperty = key.split('&&!');
+                    w20Project[fragment].modules[moduleAndProperty[0]] = w20Project[fragment].modules[moduleAndProperty[0]] || {};
+                    w20Project[fragment].modules[moduleAndProperty[0]][moduleAndProperty[1]] = '';
+                    if (typeof manifest.modules[moduleAndProperty[0]].configSchema.properties[moduleAndProperty[1]].type !== 'string') {
+                        answers[moduleAndProperty[0] + '&&!' + moduleAndProperty[1]] = JSON.parse(answers[moduleAndProperty[0] + '&&!' + moduleAndProperty[1]]);
+                    }
+                    w20Project[fragment].modules[moduleAndProperty[0]][moduleAndProperty[1]] = answers[moduleAndProperty[0] + '&&!' + moduleAndProperty[1]];
+                }
+            });
+            that.log('\n ' + fragment + ' module configuration:\n\n');
+            that.log(JSON.stringify(w20Project[fragment], null, 4));
+            that.log(JSON.stringify(w20Project, null, 4));
+            done();
+            finished();
+        }.bind(that));
+    });
+}
 
 module.exports = generators.Base.extend({
 	constructor: function() {
@@ -57,84 +106,14 @@ module.exports = generators.Base.extend({
             }.bind(this));
         },
         configureCore: function() {
-            var that = this;
-            var pathToManifest = __dirname + '/../../node_modules/w20/core/w20-core.w20.json';
-
-            this.log('\nConfigure w20-core: \n');
-            w20Project['w20-core'] = { modules: {} };
-
-            parseW20Manifest(pathToManifest, function(manifest) {
-                var prompt = [];
-                _.each(manifest.modules, function(moduleDefinition, moduleName) {
-                    w20Project['w20-core'].modules[moduleName] = {};
-                    prompt.push({
-                        type    : 'confirm',
-                        name    :  moduleName,
-                        message : 'Configure module ' + moduleName + ' ?',
-                        default : false
-                    });
-                    _.each(manifest.modules[moduleName].configSchema.properties, function(modulePropertyConfig, modulePropertyName) {
-                       w20Project['w20-core'].modules[moduleName][modulePropertyName] = '';
-                       prompt.push({
-                           type    : 'input',
-                           name    : moduleName + '&&' + modulePropertyName,
-                           message : modulePropertyConfig.description + '(' + modulePropertyConfig.type + ')',
-                           when: function(answers) {
-                               return answers[moduleName];
-                           }
-                       })
-                    });
-                });
-                var done = that.async();
-                that.prompt(prompt, function (answers) {
-                    _.each(answers, function(value, key) {
-                        if (key.indexOf('&&') > -1) {
-                            var moduleAndProperty = key.split('&&');
-                            w20Project['w20-core'].modules[moduleAndProperty[0]][moduleAndProperty[1]] = answers[moduleAndProperty[0] + '&&' + moduleAndProperty[1]];
-                        }
-                    });
-                    that.log(JSON.stringify(w20Project));
-                    done();
-                }.bind(that));
-            });
-
-
-   /*            var done = that.async();
-               that.log('Configure ' + fragment + ' fragment:\n');
-               w20Project[fragment] = { modules: {} };
-               var pathToManifest = __dirname + '/../../node_modules/w20/' + fragment.split('-')[1] + '/' + fragment + '.w20.json';
-               parseW20Manifest(pathToManifest, function(manifest) {
-                   _.each(manifest.modules, function(module) {
-                        w20Project[fragment].modules[module] = {};
-                        var done = that.async();
-                        that.prompt({
-                            type    : 'confirm',
-                            name    : 'isYes',
-                            message : 'Configure module ' + module + ' ?',
-                            default : false
-                        }, function (answer) {
-                            if (answer.isYes) {
-                *//*                that.log('Configuring ' + module);
-                                _.each(module.configSchema.properties, function(config, key) {
-                                    var doneModule = that.async();
-                                    that.prompt({
-                                        type    : 'input',
-                                        name    : configValue,
-                                        message : config.description + '(' + config.type + ')'
-                                    }, function (answer) {
-                                        w20Project[fragment].modules[module][key] = answer.configValue;
-                                        that.log(JSON.stringify(w20Project));
-                                        done();
-                                    }.bind(that));
-                                });*//*
-                            }
-                            done();
-                        }.bind(this));
-                    });
-                   done();
-               });*/
-
-
+            var done = this.async();
+            configureFragment('w20-core', this, done);
+        },
+        configureUi: function() {
+            if (w20Project.fragments.indexOf('w20-ui') > -1) {
+                var done = this.async();
+                configureFragment('w20-ui', this, done);
+            }
         }
 	},
 	configuring: function() {
