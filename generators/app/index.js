@@ -9,11 +9,13 @@ var welcome =
     '  \\__/\\__/ \\________\\_____/' + '\n';
 
 var generators = require('yeoman-generator'),
+    async = require('async'),
     _ = require('lodash'),
     fs = require('fs'),
     w20Project = {
         dir: '',
         fragments: [],
+        customFragments: [],
         theme: '',
         app: {}
     };
@@ -41,6 +43,9 @@ function prompt(config, callback, that) {
     }.bind(that));
 }
 
+// Todo use async
+// Todo remove space on some fields
+// Todo add error handling
 function configureFragment(fragment, that, isTheme) {
      var done = that.async(),
          pathToManifest = !isTheme ? __dirname + '/../../node_modules/w20/' + fragment.split('-')[1] +'/'+ fragment +'.w20.json' : __dirname + '/../../node_modules/themes/' + fragment +'/src/main/js/'+ fragment +'.w20.json';
@@ -99,6 +104,7 @@ function configureFragment(fragment, that, isTheme) {
 }
 
 function addCustomFragment(that) {
+    var done = that.async();
     var getCustomFragments = function (fragments, callback) {
         that.prompt({
             type: 'input',
@@ -122,6 +128,7 @@ function addCustomFragment(that) {
                     });
                 } else {
                     callback(fragments);
+                    done();
                 }
             });
         });
@@ -129,8 +136,173 @@ function addCustomFragment(that) {
 
     getCustomFragments([], function (fragments) {
         w20Project.customFragments = fragments;
+        _.each(w20Project.customFragments, function(fragment) {
+           w20Project.app[fragment] = {};
+        });
         that.log(JSON.stringify(w20Project, null, 4));
     });
+}
+
+
+function configureCustomFragmentI18n(customFragment, end, that) {
+    that.log('\nAvailable cultures that you have set: ' + w20Project.app['w20-core'].modules.culture.available +'\n');
+    w20Project.app[customFragment].i18n = {};
+    var i18nPrompt = _.map(w20Project.app['w20-core'].modules.culture.available, function(culture) {
+        return function(callback) {
+            that.prompt({
+                type: 'input',
+                name: culture + 'bundleLocation',
+                message: culture + ' bundle path ?'
+            }, function(answer) {
+                w20Project.app[customFragment].i18n[culture] = answer[culture + 'bundleLocation'];
+                callback();
+            });
+        };
+    });
+
+    async.series(i18nPrompt, function(err, result) {
+        end();
+    });
+}
+
+function configureCustomFragmentRoutes(customFragment, end, that) {
+    var getRoutes = function (routes, callback) {
+        that.prompt({
+            type: 'input',
+            name: 'route',
+            message: 'Enter a route name:'
+        }, function (reply) {
+            if (reply.route) {
+                routes.push(reply.route);
+            } else {
+                that.log('\nName was empty. Route was not added\n');
+            }
+            that.prompt({
+                type: 'confirm',
+                name: 'confirmed',
+                message: 'Do you want to add another route ?',
+                default: true
+            }, function (reply) {
+                if (reply.confirmed) {
+                    getRoutes(routes, function (route) {
+                        callback(route);
+                    });
+                } else {
+                    callback(routes);
+                    end();
+                }
+            });
+        });
+    };
+    getRoutes([], function (routes) {
+        w20Project.app[customFragment].routes =  w20Project.app[customFragment].routes || {};
+        _.each(routes, function(route) {
+            w20Project.app[customFragment].routes[route] = {};
+        });
+        that.log(JSON.stringify(w20Project, null, 4));
+    });
+}
+
+function configureCustomFragmentSecurity(customFragment, end, that) {
+    that.prompt({
+        type: 'input',
+        name: 'provider',
+        message: 'Provider ?'
+    }, function(answer) {
+        w20Project.app[customFragment].security = { provider: answer.provider };
+        that.prompt({
+            type: 'input',
+            name: 'config',
+            message: 'Provider configuration (object) ?'
+        }, function(answer) {
+            // todo verify if is object
+            w20Project.app[customFragment].security.config = JSON.parse(answer.config.replace(/'/g, '"'));
+            end();
+        });
+
+    });
+}
+
+function configureCustomFragment(customFragment, end, that) {
+    that.prompt({
+        type    : 'confirm',
+        name    : 'configFragment',
+        message : 'Configure custom fragment ' + customFragment + ' ?',
+        default : true
+
+    }, function(answers) {
+
+        if (!answers.configFragment) {
+            end();
+        } else {
+            var configFragmentPrompt = [
+                function(callback) {
+                    that.prompt({
+                        type    : 'confirm',
+                        name    : 'configRoute',
+                        message : 'Configure ' + customFragment + ' fragment routes ?',
+                        default : true
+                    }, function(answer) {
+                        if (answer.configRoute) {
+                            configureCustomFragmentRoutes(customFragment, callback, that);
+                        } else {
+                            callback();
+                        }
+                    });
+                },
+                function(callback) {
+                    if (w20Project.app['w20-core'].modules.culture && w20Project.app['w20-core'].modules.culture.available) {
+                        that.prompt({
+                            type    : 'confirm',
+                            name    : 'configI18n',
+                            message : 'Configure ' + customFragment + ' fragment i18n ?',
+                            default : true
+                        }, function(answer) {
+                            if (answer.configI18n) {
+                                configureCustomFragmentI18n(customFragment, callback, that);
+                            } else {
+                                callback();
+                            }
+                        });
+                    } else {
+                        callback();
+                    }
+                },
+                function(callback) {
+                    if (w20Project.app['w20-core'].modules.security) {
+                        that.prompt({
+                            type    : 'confirm',
+                            name    : 'configSecurity',
+                            message : 'Configure ' + customFragment + ' fragment security ?',
+                            default : true
+                        }, function(answer) {
+                            if (answer.configSecurity) {
+                                configureCustomFragmentSecurity(customFragment, callback, that);
+                            } else {
+                                callback();
+                            }
+                        });
+                    } else {
+                        callback();
+                    }
+                }
+            ];
+
+            async.series(configFragmentPrompt, function(err, result) {
+                end();
+            });
+        }
+    });
+
+}
+
+function configureCustomFragments(customFragments, that) {
+    var configure = _.map(customFragments, function(customFragment) {
+        return function(callback) {
+            configureCustomFragment(customFragment, callback, that);
+        };
+    });
+    async.series(configure);
 }
 
 module.exports = generators.Base.extend({
@@ -196,6 +368,9 @@ module.exports = generators.Base.extend({
         },
         customFragment: function() {
             addCustomFragment(this);
+        },
+        configureCustomFragment: function() {
+            configureCustomFragments(w20Project.customFragments, this);
         }
 	},
 	configuring: function() {
