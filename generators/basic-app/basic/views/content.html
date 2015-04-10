@@ -1,0 +1,66 @@
+<div class="container-fluid">
+	<div class="row">
+		<div class="col-md-12">
+			<h1>{{ 'application.view.basic.content' | localize }}</h1>
+			<div class="alert alert-danger">
+				<a class="close" data-dismiss="alert" href="#">x</a>
+				<h4 class="alert-heading">Error !</h4>
+				There was an error in your request.
+			</div>
+			<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+
+			<ul class="nav nav-tabs">
+				<li class="active"><a data-toggle="tab" href="#tab1">Tab 1</a></li>
+				<li><a data-toggle="tab" href="#tab2">Tab 2</a></li>
+				<li><a data-toggle="tab" href="#tab3">Tab 3</a></li>
+			</ul>
+			<div class="tab-content">
+                <div id="tab1" class="tab-pane fade in active">
+                    <h3>Form</h3>
+                    <form role="form" class="col-md-4">
+                        <div class="form-group">
+                            <label for="exampleInputEmail1">Email address</label>
+                            <input type="email" class="form-control" id="exampleInputEmail1" placeholder="Enter email">
+                        </div>
+                        <div class="form-group">
+                            <label for="exampleInputPassword1">Password</label>
+                            <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password">
+                        </div>
+                        <div class="form-group">
+                            <label for="exampleInputFile">File input</label>
+                            <input type="file" id="exampleInputFile">
+                            <p class="help-block">Example block-level help text here.</p>
+                        </div>
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox"> Check me out
+                            </label>
+                        </div>
+                        <button type="submit" class="btn btn-default">Submit</button>
+                    </form>
+                </div>
+                <div id="tab2" class="tab-pane fade">
+                    <h3>Table</h3>
+                    <table class="table table-striped">
+                        <thead>
+                        <tr>
+                            <th>First name</th>
+                            <th>Last name</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr data-ng-repeat="user in users">
+                            <td>{{ user.firstName }}</td>
+                            <td>{{ user.lastName }}</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div id="tab3" class="tab-pane fade">
+                    <h3>More</h3>
+                    ...
+                </div>
+            </div>
+		</div>
+	</div>
+</div>
