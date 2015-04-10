@@ -2,7 +2,20 @@
   "name": "generator-w20",
   "version": "0.1.0",
   "description": "SeedStack web framework (w20) generator",
-  "keywords": ["yeoman-generator", "w20", "seedstack", "web", "angularJS", "requirejs", "webapp"],
+  "author": "SeedStack",
+  "license": "MPL",
+  "keywords": [
+      "yeoman-generator",
+      "w20",
+      "seedstack",
+      "web",
+      "angularJS",
+      "requirejs",
+      "webapp"
+  ],
+  "files": [
+      "app"
+  ],
   "dependencies": {
     "yeoman-generator": "^0.18.3",
     "lodash": "^2.4.1",

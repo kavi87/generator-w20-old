@@ -3,8 +3,7 @@
 
 var generators = require('yeoman-generator'),
     _ = require('lodash'),
-    async = require('async'),
-    fs = require('fs'),
+    defaultConfig = require('../config/default'),
     welcome =
     ' __      _________________   ' + '\n' +
     '/  \\    /  \\_____  \\   _  \\  ' + '\n' +
@@ -16,8 +15,7 @@ var generators = require('yeoman-generator'),
 var w20Project =  {
     appName: '',
     fragments: [],
-    theme: '',
-    app: {}
+    w20App: {}
 };
 
 module.exports = generators.Base.extend({
@@ -55,7 +53,7 @@ module.exports = generators.Base.extend({
                 default : this.appname
             }, function (answers) {
 
-                    w20Project.directory = answers.name;
+                    w20Project.appName = answers.name;
 
             }, that);
         },
@@ -97,7 +95,7 @@ module.exports = generators.Base.extend({
                 default : ['w20-business-theme']
             }, function (answers) {
 
-                    w20Project.theme = answers.theme;
+                w20Project.fragments = w20Project.fragments.concat(answers.theme);
 
             }, that);
         }
@@ -108,9 +106,19 @@ module.exports = generators.Base.extend({
 
         _.each(w20Project.fragments, function(fragment) {
 
+            var fragmentConf = defaultConfig[fragment];
+
+            w20Project.w20App[fragmentConf.path] = fragmentConf.definition;
+
         });
+
+        console.log(JSON.stringify(w20Project, null, 2));
+
 	},
 	writing : function() {
+        var that = this;
+
+
 
 	},
 	conflicts: function() {
