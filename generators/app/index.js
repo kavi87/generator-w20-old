@@ -6,14 +6,14 @@ var generators = require('yeoman-generator'),
     prettyjson = require('prettyjson'),
     defaultConfig = require('./default-config'),
     welcome =
-    ' __      _________________   ' + '\n' +
-    '/  \\    /  \\_____  \\   _  \\  ' + '\n' +
-    '\\   \\/\\/   //  ____/  / \\  \\ ' + '\n' +
-    ' \\        //       \\  \\_/  /' + '\n' +
-    '  \\__/\\__/ \\________\\_____/' + '\n';
+        ' __      _________________   ' + '\n' +
+        '/  \\    /  \\_____  \\   _  \\  ' + '\n' +
+        '\\   \\/\\/   //  ____/  / \\  \\ ' + '\n' +
+        ' \\        //       \\  \\_/  /' + '\n' +
+        '  \\__/\\__/ \\________\\_____/' + '\n';
 
 
-var w20Project =  {
+var w20Project = {
     fragment: '',
     w20Fragments: [],
     w20App: {}
@@ -37,65 +37,65 @@ module.exports = generators.Base.extend({
         }.bind(that));
     },
 
-	constructor: function() {
-		generators.Base.apply(this, arguments);
-	},
+    constructor: function () {
+        generators.Base.apply(this, arguments);
+    },
 
-	initializing: function() {
+    initializing: function () {
         this.log(welcome);
-	},
+    },
 
-	prompting: {
+    prompting: {
 
-        fragment: function() {
+        fragment: function () {
             var that = this;
 
             that._prompt({
-                type    : 'input',
-                name    : 'name',
-                message : 'Your project fragment name ?',
-                default : this.appname
+                type: 'input',
+                name: 'name',
+                message: 'Your project fragment name ?',
+                default: this.appname
             }, function (answers) {
 
-                    w20Project.fragment = answers.name;
+                w20Project.fragment = answers.name;
 
             }, that);
         },
 
-        w20Fragments: function() {
+        w20Fragments: function () {
             var that = this;
 
             that._prompt({
-                type    : 'checkbox',
-                name    : 'w20Fragments',
-                message : 'W20 fragments to use aside core ? ',
-                choices : ['ui', 'dataviz', 'touch', 'extra'],
-                default : ['ui']
+                type: 'checkbox',
+                name: 'w20Fragments',
+                message: 'W20 fragments to use aside core ? ',
+                choices: ['ui', 'dataviz', 'touch', 'extra'],
+                default: ['ui']
             }, function (answers) {
 
-                    w20Project.w20Fragments = answers.w20Fragments.concat(['core']);
+                w20Project.w20Fragments = answers.w20Fragments.concat(['core']);
 
             }, that);
         },
 
-        theme: function() {
+        theme: function () {
             var that = this;
 
             that._prompt({
-                type    : 'list',
-                name    : 'theme',
-                message : 'Use a W20 theme ?',
-                choices : ['w20-business-theme', 'none'],
-                default : ['w20-business-theme']
+                type: 'list',
+                name: 'theme',
+                message: 'Use a W20 theme ?',
+                choices: ['w20-business-theme', 'none'],
+                default: ['w20-business-theme']
             }, function (answers) {
 
                 w20Project.w20Fragments = w20Project.w20Fragments.concat(answers.theme);
 
             }, that);
         }
-	},
+    },
 
-	configuring: function() {
+    configuring: function () {
         this._print('Configuring application...');
 
         var that = this;
@@ -103,7 +103,7 @@ module.exports = generators.Base.extend({
         // Set the home view path
         defaultConfig.core.definition.modules.application.home = '/' + w20Project.fragment + '/' + 'content';
 
-        _.each(w20Project.w20Fragments, function(fragment) {
+        _.each(w20Project.w20Fragments, function (fragment) {
             var fragmentConf = defaultConfig[fragment];
 
             if (fragmentConf) {
@@ -114,8 +114,8 @@ module.exports = generators.Base.extend({
 
         // Add the user fragment
         w20Project.w20App[w20Project.fragment + '/' + w20Project.fragment + '.w20.json'] = {};
-	},
-	writing : function() {
+    },
+    writing: function () {
         this._print('Writing...');
 
         var that = this,
@@ -140,15 +140,15 @@ module.exports = generators.Base.extend({
         );
 
         that.fs.write(this.destinationPath('w20.app.json'), JSON.stringify(w20Project.w20App, null, 4));
-	},
-	conflicts: function() {
+    },
+    conflicts: function () {
 
-	},
-	install: function() {
+    },
+    install: function () {
         this._print('Installing dependencies...');
         this.bowerInstall();
-	},
-	end: function() {
+    },
+    end: function () {
         this._print('Done.');
-	}
+    }
 });
