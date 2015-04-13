@@ -3,7 +3,8 @@
 
 var generators = require('yeoman-generator'),
     _ = require('lodash'),
-    defaultConfig = require('../config/default'),
+    prettyjson = require('prettyjson'),
+    defaultConfig = require('./default-config'),
     welcome =
     ' __      _________________   ' + '\n' +
     '/  \\    /  \\_____  \\   _  \\  ' + '\n' +
@@ -13,12 +14,16 @@ var generators = require('yeoman-generator'),
 
 
 var w20Project =  {
-    appName: '',
-    fragments: [],
+    fragment: '',
+    w20Fragments: [],
     w20App: {}
 };
 
 module.exports = generators.Base.extend({
+
+    _print: function (msg) {
+        this.log('\n' + msg + '\n');
+    },
 
     _prompt: function (config, callback) {
         var that = this;
@@ -34,7 +39,6 @@ module.exports = generators.Base.extend({
 
 	constructor: function() {
 		generators.Base.apply(this, arguments);
-        this.option('psa');
 	},
 
 	initializing: function() {
@@ -43,38 +47,33 @@ module.exports = generators.Base.extend({
 
 	prompting: {
 
-        appName: function() {
+        fragment: function() {
             var that = this;
 
             that._prompt({
                 type    : 'input',
                 name    : 'name',
-                message : 'Your project name ? (default to current folder name)',
+                message : 'Your project fragment name ?',
                 default : this.appname
             }, function (answers) {
 
-                    w20Project.appName = answers.name;
+                    w20Project.fragment = answers.name;
 
             }, that);
         },
 
-        fragments: function() {
+        w20Fragments: function() {
             var that = this;
-
-            var choices = ['ui', 'dataviz', 'touch', 'extra'];
-            if (that.options.psa) {
-                choices = choices.concat(['compatibility']);
-            }
 
             that._prompt({
                 type    : 'checkbox',
-                name    : 'fragments',
+                name    : 'w20Fragments',
                 message : 'W20 fragments to use aside core ? ',
-                choices : choices,
+                choices : ['ui', 'dataviz', 'touch', 'extra'],
                 default : ['ui']
             }, function (answers) {
 
-                    w20Project.fragments = answers.fragments.concat(['core']);
+                    w20Project.w20Fragments = answers.w20Fragments.concat(['core']);
 
             }, that);
         },
@@ -82,52 +81,74 @@ module.exports = generators.Base.extend({
         theme: function() {
             var that = this;
 
-            var choices = ['w20-business-theme', 'none'];
-            if (that.options.psa) {
-                choices = choices.concat(['w20-simple-theme', 'w20-psa-manufacturing-theme', 'w20-brand-theme']);
-            }
-
             that._prompt({
                 type    : 'list',
                 name    : 'theme',
                 message : 'Use a W20 theme ?',
-                choices : choices,
+                choices : ['w20-business-theme', 'none'],
                 default : ['w20-business-theme']
             }, function (answers) {
 
-                w20Project.fragments = w20Project.fragments.concat(answers.theme);
+                w20Project.w20Fragments = w20Project.w20Fragments.concat(answers.theme);
 
             }, that);
         }
 	},
 
 	configuring: function() {
+        this._print('Configuring application...');
+
         var that = this;
 
-        _.each(w20Project.fragments, function(fragment) {
+        // Set the home view path
+        defaultConfig.core.definition.modules.application.home = '/' + w20Project.fragment + '/' + 'content';
 
+        _.each(w20Project.w20Fragments, function(fragment) {
             var fragmentConf = defaultConfig[fragment];
 
-            w20Project.w20App[fragmentConf.path] = fragmentConf.definition;
+            if (fragmentConf) {
+                w20Project.w20App[fragmentConf.path] = fragmentConf.definition;
+            }
 
         });
 
-        console.log(JSON.stringify(w20Project, null, 2));
-
+        // Add the user fragment
+        w20Project.w20App[w20Project.fragment + '/' + w20Project.fragment + '.w20.json'] = {};
 	},
 	writing : function() {
-        var that = this;
+        this._print('Writing...');
 
+        var that = this,
+            tplContext = { title: w20Project.fragment };
 
+        that.fs.copyTpl(
+            this.templatePath('root'),
+            this.destinationPath('.'),
+            tplContext
+        );
 
+        that.fs.copyTpl(
+            this.templatePath('basic-fragment'),
+            this.destinationPath(w20Project.fragment),
+            tplContext
+        );
+
+        that.fs.copyTpl(
+            this.templatePath('basic-fragment.w20.json'),
+            this.destinationPath(w20Project.fragment + '/' + w20Project.fragment + '.w20.json'),
+            tplContext
+        );
+
+        that.fs.write(this.destinationPath('w20.app.json'), JSON.stringify(w20Project.w20App, null, 4));
 	},
 	conflicts: function() {
 
 	},
 	install: function() {
-       // this.npmInstall();
+        this._print('Installing dependencies...');
+        this.bowerInstall();
 	},
 	end: function() {
-
+        this._print('Done.');
 	}
 });

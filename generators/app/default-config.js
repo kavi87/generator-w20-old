@@ -75,9 +75,7 @@ var extra = {
         "analytics": {
             "provider": "piwik",
             "virtualPageViews": true,
-            "settings": {
-
-            }
+            "settings": {}
         }
     }
 };
@@ -164,6 +162,7 @@ module.exports = {
     touch: {path:  "bower_components/w20/touch/w20-touch.w20.json", definition: touch },
     extra: { path:"bower_components/w20/extra/w20-extra.w20.json", definition: extra },
     'w20-business-theme': { path:"bower_components/w20-business-theme/w20-business-theme.w20.json", definition: businessTheme },
+    // todo handle psa specific
     compatibility: { path:"", definition: compatibility },
     'w20-psa-manufacturing-theme': { path:"", definition: psaManufacturing },
     'w20-psa-brand-theme': { path:"", definition: psaBrandTheme },

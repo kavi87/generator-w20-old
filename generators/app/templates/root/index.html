@@ -3,11 +3,11 @@
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" charset="utf-8"/>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
-    <title>W20 basic sample</title>
-    <script type="text/javascript" data-main="../../w20/w20-core/modules/w20" src="../../w20/w20-core/libext/requirejs/require.js"></script>
+    <title><%= title %></title>
+    <script type="text/javascript" data-main="bower_components/w20/core/modules/w20" src="bower_components/requirejs/require.js"></script>
 </head>
 <body>
-<div data-w20-topbar data-title="'W20 basic'"></div>
+<div data-w20-topbar data-title="'${ title }'"></div>
 <div id="w20-view" class="w20-content" data-ng-view></div>
 </body>
 </html>

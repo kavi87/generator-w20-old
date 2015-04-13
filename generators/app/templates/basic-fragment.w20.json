@@ -1,0 +1,23 @@
+{
+    "id": "${ title }",
+    "name": "W20 ${ title } fragment",
+
+    "modules": {
+        "content": {
+            "path": "{${ title }}/modules/content",
+            "autoload": true
+        }
+    },
+
+    "i18n": {
+        "en": ["{${ title }}/i18n/messages-en.json"],
+        "fr": ["{${ title }}/i18n/messages-fr.json"]
+    },
+
+    "routes": {
+        "content":{
+            "templateUrl":"{${ title }}/views/content.html",
+            "controller":"ContentController"
+        }
+    }
+}
