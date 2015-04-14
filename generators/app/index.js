@@ -115,6 +115,7 @@ module.exports = generators.Base.extend({
         // Add the user fragment
         w20Project.w20App[w20Project.fragment + '/' + w20Project.fragment + '.w20.json'] = {};
     },
+
     writing: function () {
         this._print('Writing...');
 
@@ -144,10 +145,13 @@ module.exports = generators.Base.extend({
     conflicts: function () {
 
     },
+
     install: function () {
         this._print('Installing dependencies...');
+
         this.bowerInstall();
     },
+
     end: function () {
         this._print('Done.');
     }
