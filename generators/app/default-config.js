@@ -17,7 +17,7 @@ var core = {
             "default": "en"
         },
         "env": {
-            "type": "dev"
+            "type": "test"
         },
         "security": {
             "autoLogin": true,
