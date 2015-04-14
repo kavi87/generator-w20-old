@@ -65,8 +65,7 @@ var dataviz = {
 
 var touch = {
     "modules": {
-        "touch": {},
-        "virtualkeyboard": {}
+        "touch": {}
     }
 };
 

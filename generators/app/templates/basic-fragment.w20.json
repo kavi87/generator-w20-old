@@ -6,6 +6,10 @@
         "content": {
             "path": "{${ title }}/modules/content",
             "autoload": true
+        },
+        "style": {
+            "path": "[css]!{${ title }}/style/style.css",
+            "autoload": true
         }
     },
 
