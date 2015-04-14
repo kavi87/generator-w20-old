@@ -57,6 +57,7 @@ module.exports = generators.Base.extend({
                 default: this.appname
             }, function (answers) {
 
+                answers.name = answers.name.split(' ').join('-');
                 w20Project.fragment = answers.name;
 
             }, that);
