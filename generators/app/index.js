@@ -1,6 +1,9 @@
 /*jshint node: true */
 'use strict';
 
+var W20_VERSION = '^2.0.0',
+    THEME_VERSION = '^1.0.0-M1';
+
 var generators = require('yeoman-generator'),
     _ = require('lodash'),
     prettyjson = require('prettyjson'),
@@ -16,7 +19,9 @@ var generators = require('yeoman-generator'),
 var w20Project = {
     fragment: '',
     w20Fragments: [],
-    w20App: {}
+    w20App: {},
+    theme: '',
+    bower: {}
 };
 
 module.exports = generators.Base.extend({
@@ -90,7 +95,8 @@ module.exports = generators.Base.extend({
                 default: ['w20-business-theme']
             }, function (answers) {
 
-                w20Project.w20Fragments = w20Project.w20Fragments.concat(answers.theme);
+                w20Project.theme = answers.theme;
+                w20Project.w20Fragments = w20Project.w20Fragments.concat(w20Project.theme);
 
             }, that);
         }
@@ -101,9 +107,26 @@ module.exports = generators.Base.extend({
 
         var that = this;
 
+        // Configure project bower.json
+        var dependencies = {
+            "w20": W20_VERSION
+        };
+        if (w20Project.theme) {
+            dependencies[w20Project.theme] = THEME_VERSION;
+        }
+        w20Project.bower = {
+            name: w20Project.fragment,
+            version: "0.1.0",
+            dependencies: dependencies
+        };
+
         // Set the home view path
         defaultConfig.core.definition.modules.application.home = '/' + w20Project.fragment + '/' + 'content';
 
+        // Add the user fragment
+        w20Project.w20App[w20Project.fragment + '/' + w20Project.fragment + '.w20.json'] = {};
+
+        // Set the w20 fragments default config
         _.each(w20Project.w20Fragments, function (fragment) {
             var fragmentConf = defaultConfig[fragment];
 
@@ -112,9 +135,6 @@ module.exports = generators.Base.extend({
             }
 
         });
-
-        // Add the user fragment
-        w20Project.w20App[w20Project.fragment + '/' + w20Project.fragment + '.w20.json'] = {};
     },
 
     writing: function () {
@@ -142,7 +162,10 @@ module.exports = generators.Base.extend({
         );
 
         that.fs.write(this.destinationPath('w20.app.json'), JSON.stringify(w20Project.w20App, null, 4));
+
+        that.fs.write(this.destinationPath('bower.json'), JSON.stringify(w20Project.bower, null, 4));
     },
+
     conflicts: function () {
 
     },

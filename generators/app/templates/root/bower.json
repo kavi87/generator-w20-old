@@ -1,7 +1,0 @@
-{
-    "name": "${ title }",
-    "version": "0.0.0",
-    "dependencies": {
-        "w20": "^2.0.0"
-    }
-}
