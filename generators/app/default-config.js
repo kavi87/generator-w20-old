@@ -82,13 +82,12 @@ var extra = {
 var businessTheme = {
     "modules": {
         "main": {
-            "sideMenuWidth": 100,
+            "sidebar": { "width": 270 },
             "logoUrl": "",
-            "links":  [{label: '', i18n: '', href: '', target: '', security: ''}],
-            "hideConnectivity": false,
+            "links":  [{label: '', i18n: 'custom.link.key', href: 'https://www.google.com', target: '_blank', security: ''}],
+            "hideConnectivity": true,
             "hideCulture": false,
-            "hideSecurity": false,
-            "profileChooser": false
+            "hideSecurity": true
         }
     }
 };
@@ -149,7 +148,8 @@ var psaBrandTheme = {
             "applications": [{'name': '', 'href': '', 'selected': true}],
             "headerLinks": [{label: '', i18n: '', href: '', target: ''}],
             "selectOptionsList": [],
-            "selectOptionsExecute": ""
+            "selectOptionsExecute": "",
+            "sideMenuWidth": 380
         }
     }
 };

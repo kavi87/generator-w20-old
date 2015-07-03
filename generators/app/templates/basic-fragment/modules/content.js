@@ -1,8 +1,9 @@
 define([
+    'require',
     '{angular}/angular',
     '{angular-resource}/angular-resource'
 
-], function(angular) {
+], function (require, angular) {
     'use strict';
 
 	var module = angular.module('content', ['ngResource']);

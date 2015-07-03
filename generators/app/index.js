@@ -2,11 +2,10 @@
 'use strict';
 
 var W20_VERSION = '^2.0.0',
-    THEME_VERSION = '^1.0.0-M1';
+    THEME_VERSION = '^1.0.0-M2';
 
 var generators = require('yeoman-generator'),
     _ = require('lodash'),
-    prettyjson = require('prettyjson'),
     defaultConfig = require('./default-config'),
     welcome =
         ' __      _________________   ' + '\n' +
@@ -109,6 +108,7 @@ module.exports = generators.Base.extend({
 
         // Configure project bower.json
         var dependencies = {
+            "angular-mocks": "~1.3.6",
             "w20": W20_VERSION
         };
         if (w20Project.theme) {
@@ -149,6 +149,13 @@ module.exports = generators.Base.extend({
             tplContext
         );
 
+        // copy dot files
+        that.fs.copy(
+            this.templatePath('root/.*'),
+            this.destinationPath('.'),
+            tplContext
+        );
+
         that.fs.copyTpl(
             this.templatePath('basic-fragment'),
             this.destinationPath(w20Project.fragment),
@@ -173,10 +180,11 @@ module.exports = generators.Base.extend({
     install: function () {
         this._print('Installing dependencies...');
 
-        this.bowerInstall();
+        this.installDependencies();
     },
 
     end: function () {
-        this._print('Done.');
+        this._print('Done.\n');
+        this._print('Enter "grunt connect" to start the app');
     }
 });

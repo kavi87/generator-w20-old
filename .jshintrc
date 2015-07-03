@@ -114,5 +114,25 @@
     "predef": [         // Extra globals.
         //"exampleVar",
     ],
-    "indent": 4         // Specify indentation spacing
+    "indent": 4,         // Specify indentation spacing
+    "globals"       : {
+        "define"    : false,
+        "requirejs" : false,
+        "require"   : false,
+        "console"   : false,
+        "process"   : false,
+        "jasmine"   : false,
+        "describe"  : false,
+        "it"        : false,
+        "xit"       : false,
+        "iit"       : false,
+        "before"    : false,
+        "beforeEach": false,
+        "after"     : false,
+        "afterEach" : false,
+        "expect"    : false,
+        "waitsFor"  : false,
+        "spyOn"     : false,
+        "runs"      : false
+    }
 }

@@ -1,4 +1,6 @@
 {
 	"application.view.${ title }.content": "Exemple de contenu",
-	"application.view.${ title }.welcome": "Bienvenu"
+	"application.view.${ title }.welcome": "Bienvenu",
+
+    "custom.link.key": "Lien utilisateur"
 }

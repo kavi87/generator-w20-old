@@ -1,4 +1,6 @@
 {
 	"application.view.${ title }.content": "Sample content",
-	"application.view.${ title }.welcome": "Welcome"
+	"application.view.${ title }.welcome": "Welcome",
+
+    "custom.link.key": "Custom link key"
 }
