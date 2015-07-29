@@ -1,7 +1,15 @@
 /* global module: false, grunt: false, process: false */
+var requirejs = require('requirejs'),
+    fs = require('fs'),
+    _ = require('lodash');
+
 module.exports = function (grunt) {
     'use strict';
 
+    /*
+    * Individual grunt tasks.
+    *
+    **/
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
         clean: [
@@ -31,38 +39,6 @@ module.exports = function (grunt) {
                 autoWatch: true
             }
         },
-        purifycss: {
-            options: {
-                rejected: true,
-                info: true
-            },
-            target: {
-                src: ['<%= title %>/**/*.js', '<%= title %>/**/*.html'],
-                css: ['<%= title %>/style/*.css'],
-                dest: '.tmp/<%= title %>-purified.css'
-            }
-        },
-        concat: {
-            options: {
-                sourceMap: true
-            },
-            all: {
-                src: ['<%= title %>/modules/*.js'],
-                dest: '.tmp/<%= title %>-concat.js'
-            }
-        },
-        uglify: {
-            all: {
-                options: {
-                    sourceMap: true,
-                    sourceMapIncludeSources: true,
-                    sourceMapIn: '.tmp/<%= title %>-concat.js.map'
-                },
-                files: {
-                    'dist/<%= title %>.min.js': ['.tmp/<%= title %>-concat.js']
-                }
-            }
-        },
         connect: {
             server: {
                 options: {
@@ -82,7 +58,6 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-coveralls');
     grunt.loadNpmTasks('grunt-bower-task');
     grunt.loadNpmTasks('grunt-contrib-connect');
-    grunt.loadNpmTasks('grunt-purifycss');
 
-    grunt.registerTask('default', ['jshint', 'bower', 'karma:test', 'concat', 'uglify']);
+    grunt.registerTask('default', ['jshint', 'bower', 'karma:test'], null);
 };

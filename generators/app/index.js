@@ -1,8 +1,8 @@
 /*jshint node: true */
 'use strict';
 
-var W20_VERSION = '^2.0.0',
-    THEME_VERSION = '^1.0.0-M2';
+var W20_VERSION = 'latest',
+    THEME_VERSION = 'latest';
 
 var generators = require('yeoman-generator'),
     _ = require('lodash'),
@@ -30,15 +30,15 @@ module.exports = generators.Base.extend({
     },
 
     _prompt: function (config, callback) {
-        var that = this;
+        var self = this;
 
-        var done = that.async();
-        that.prompt(config, function (answers) {
+        var done = self.async();
+        self.prompt(config, function (answers) {
 
             callback(answers);
             done();
 
-        }.bind(that));
+        }.bind(self));
     },
 
     constructor: function () {
@@ -52,9 +52,9 @@ module.exports = generators.Base.extend({
     prompting: {
 
         fragment: function () {
-            var that = this;
+            var self = this;
 
-            that._prompt({
+            self._prompt({
                 type: 'input',
                 name: 'name',
                 message: 'Your project fragment name ?',
@@ -64,29 +64,29 @@ module.exports = generators.Base.extend({
                 answers.name = answers.name.split(' ').join('-');
                 w20Project.fragment = answers.name;
 
-            }, that);
+            }, self);
         },
 
         w20Fragments: function () {
-            var that = this;
+            var self = this;
 
-            that._prompt({
+            self._prompt({
                 type: 'checkbox',
                 name: 'w20Fragments',
                 message: 'W20 fragments to use aside core ? ',
-                choices: ['ui', 'dataviz', 'touch', 'extra'],
+                choices: ['ui', 'dataviz', 'extra'],
                 default: ['ui']
             }, function (answers) {
 
                 w20Project.w20Fragments = answers.w20Fragments.concat(['core']);
 
-            }, that);
+            }, self);
         },
 
         theme: function () {
-            var that = this;
+            var self = this;
 
-            that._prompt({
+            self._prompt({
                 type: 'list',
                 name: 'theme',
                 message: 'Use a W20 theme ?',
@@ -94,17 +94,16 @@ module.exports = generators.Base.extend({
                 default: ['w20-business-theme']
             }, function (answers) {
 
-                w20Project.theme = answers.theme;
-                w20Project.w20Fragments = w20Project.w20Fragments.concat(w20Project.theme);
-
-            }, that);
+                if (answers.theme !== 'none') {
+                    w20Project.theme = answers.theme;
+                    w20Project.w20Fragments = w20Project.w20Fragments.concat(w20Project.theme);
+                }
+            }, self);
         }
     },
 
     configuring: function () {
         this._print('Configuring application...');
-
-        var that = this;
 
         // Configure project bower.json
         var dependencies = {
@@ -140,37 +139,37 @@ module.exports = generators.Base.extend({
     writing: function () {
         this._print('Writing...');
 
-        var that = this,
+        var self = this,
             tplContext = { title: w20Project.fragment };
 
-        that.fs.copyTpl(
+        self.fs.copyTpl(
             this.templatePath('root'),
             this.destinationPath('.'),
             tplContext
         );
 
         // copy dot files
-        that.fs.copy(
+        self.fs.copy(
             this.templatePath('root/.*'),
             this.destinationPath('.'),
             tplContext
         );
 
-        that.fs.copyTpl(
+        self.fs.copyTpl(
             this.templatePath('basic-fragment'),
             this.destinationPath(w20Project.fragment),
             tplContext
         );
 
-        that.fs.copyTpl(
+        self.fs.copyTpl(
             this.templatePath('basic-fragment.w20.json'),
             this.destinationPath(w20Project.fragment + '/' + w20Project.fragment + '.w20.json'),
             tplContext
         );
 
-        that.fs.write(this.destinationPath('w20.app.json'), JSON.stringify(w20Project.w20App, null, 4));
+        self.fs.write(this.destinationPath('w20.app.json'), JSON.stringify(w20Project.w20App, null, 4));
 
-        that.fs.write(this.destinationPath('bower.json'), JSON.stringify(w20Project.bower, null, 4));
+        self.fs.write(this.destinationPath('bower.json'), JSON.stringify(w20Project.bower, null, 4));
     },
 
     conflicts: function () {
@@ -178,13 +177,19 @@ module.exports = generators.Base.extend({
     },
 
     install: function () {
-        this._print('Installing dependencies...');
+        var self = this;
 
-        this.installDependencies();
+        self._print('Installing dependencies...');
+
+        this.installDependencies({ callback: function () {
+            self._print('Done Installing dependencies\n');
+        }});
     },
 
     end: function () {
         this._print('Done.\n');
+        this._print('If you got dependencies errors with npm, try running npm cache clean && npm install\n');
+        this._print('If you got dependencies errors with bower, try removing the bower_components and do a bower install\n');
         this._print('Enter "grunt connect" to start the app');
     }
 });

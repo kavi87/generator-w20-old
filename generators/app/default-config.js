@@ -63,11 +63,6 @@ var dataviz = {
     }
 };
 
-var touch = {
-    "modules": {
-        "touch": {}
-    }
-};
 
 var extra = {
     "modules": {
@@ -158,9 +153,9 @@ module.exports = {
     core: { path: "bower_components/w20/core/w20-core.w20.json", definition: core },
     ui: { path: "bower_components/w20/ui/w20-ui.w20.json", definition: ui } ,
     dataviz: { path: "bower_components/w20/dataviz/w20-dataviz.w20.json", definition: dataviz },
-    touch: {path:  "bower_components/w20/touch/w20-touch.w20.json", definition: touch },
     extra: { path:"bower_components/w20/extra/w20-extra.w20.json", definition: extra },
     'w20-business-theme': { path:"bower_components/w20-business-theme/w20-business-theme.w20.json", definition: businessTheme },
+
     // todo handle psa specific
     compatibility: { path:"", definition: compatibility },
     'w20-psa-manufacturing-theme': { path:"", definition: psaManufacturing },
